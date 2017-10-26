@@ -19,12 +19,7 @@ import java.security.Principal;
 import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
-
-/**
- * Created by fan.jin on 2016-10-15.
- */
-
-@Api(name = "books services", description = "Methods for managing books list")
+@Api(name = "User services", description = "Manager User")
 @RestController
 @RequestMapping( value = "/api", produces = MediaType.APPLICATION_JSON_VALUE )
 public class UserController {
@@ -34,12 +29,11 @@ public class UserController {
     
     @ApiAuthToken
     @ApiMethod(
-            description = "Get list of all books",
+            description = "Get user by id",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     @ApiResponseObject
     @RequestMapping( method = GET, value = "/user/{userId}" )
     @PreAuthorize("hasRole('ADMIN')")
-   
     public User loadById( @ApiPathParam(name = "userId", description = "User Id") @PathVariable Long userId ) {
         return this.userService.findById( userId );
     }
@@ -50,15 +44,10 @@ public class UserController {
         return this.userService.findAll();
     }
 
-
-    /*
-     *  We are not using userService.findByUsername here(we could),
-     *  so it is good that we are making sure that the user has role "ROLE_USER"
-     *  to access this endpoint.
-     */
     @RequestMapping("/whoami")
     @PreAuthorize("hasRole('USER')")
     public User user(Principal user) {
         return this.userService.findByUsername(user.getName());
     }
+    
 }

@@ -18,6 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import com.tmdt.security.TokenHelper;
 import com.tmdt.security.auth.*;
@@ -89,6 +92,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
     }
 
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("OPTIONS");
+        config.addAllowedMethod("GET");
+        config.addAllowedMethod("POST");
+        config.addAllowedMethod("PUT");
+        config.addAllowedMethod("DELETE");
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -102,14 +120,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/",
                 "/h2/**", // vao trang quan tri database h2 , còn erro k vao đc  
                 "/**/**/*.do", // h2
-                 "/jsondoc", // vao json doc
-                "/webjars/**",
+                 "/jsondoc", //  vao json doc,
+                  "/test/**",  // test angular 
+                "/webjars/**", 
                 "/*.html",
                 "/favicon.ico",
                 "/**/*.html",
                 "/**/*.css",
                 "/**/*.js"
             );
+        //web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
 
     }
 }

@@ -42,6 +42,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         String username;
         String authToken = tokenHelper.getToken(request);
 
+        response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
+        response.setHeader("Access-Control-Max-Age", "3600");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, remember-me, authorization, x-auth-token");   
         if (authToken != null) {
             // get username from token
             username = tokenHelper.getUsernameFromToken(authToken);
@@ -56,7 +61,13 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         }
-        chain.doFilter(request, response);
+        
+        if("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            chain.doFilter(request, response);
+        }
+        
     }
 
 }
