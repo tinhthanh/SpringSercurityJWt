@@ -100,8 +100,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(
                 HttpMethod.GET,
                 "/",
-                "/h2/**",
-                "/**/**/*.do",
+                "/h2/**", // vao trang quan tri database h2 , còn erro k vao đc  
+                "/**/**/*.do", // h2
+                 "/jsondoc", // vao json doc
                 "/webjars/**",
                 "/*.html",
                 "/favicon.ico",

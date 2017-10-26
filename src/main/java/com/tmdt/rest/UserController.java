@@ -3,6 +3,11 @@ package com.tmdt.rest;
 import com.tmdt.model.User;
 import com.tmdt.service.UserService;
 
+import org.jsondoc.core.annotation.Api;
+import org.jsondoc.core.annotation.ApiAuthToken;
+import org.jsondoc.core.annotation.ApiMethod;
+import org.jsondoc.core.annotation.ApiPathParam;
+import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,16 +24,23 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * Created by fan.jin on 2016-10-15.
  */
 
+@Api(name = "books services", description = "Methods for managing books list")
 @RestController
 @RequestMapping( value = "/api", produces = MediaType.APPLICATION_JSON_VALUE )
 public class UserController {
 
     @Autowired
     private UserService userService;
-
+    
+    @ApiAuthToken
+    @ApiMethod(
+            description = "Get list of all books",
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ApiResponseObject
     @RequestMapping( method = GET, value = "/user/{userId}" )
     @PreAuthorize("hasRole('ADMIN')")
-    public User loadById( @PathVariable Long userId ) {
+   
+    public User loadById( @ApiPathParam(name = "userId", description = "User Id") @PathVariable Long userId ) {
         return this.userService.findById( userId );
     }
 
