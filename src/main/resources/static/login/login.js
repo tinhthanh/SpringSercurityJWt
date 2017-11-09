@@ -23,7 +23,7 @@ angular.module('myApp.login', ['ngRoute'])
         'Content-Type': 'application/json'
       }
     })
-    .then(function(res) {
+    .then(function() {
       $rootScope.authenticated = true;
       $location.path("#/");
       $rootScope.selectedTab = "/";

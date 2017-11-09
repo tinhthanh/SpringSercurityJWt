@@ -59,6 +59,7 @@ DashboardCtrl.resolve = {
 		$http({method: 'GET', url: 'auth/refresh'})
 		.success(function(data) {
 			deferred.resolve(data.access_token !== null);
+			console.log('dm ');
 		})
 		.error(function(data){
 			deferred.resolve(false); // you could optionally pass error data here

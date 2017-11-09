@@ -63,7 +63,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
+    	
+        http.csrf().disable()
                 .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS ).and()
                 .exceptionHandling().authenticationEntryPoint( restAuthenticationEntryPoint ).and()
                 .authorizeRequests()
@@ -90,6 +91,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .ignoringAntMatchers("/auth/login")
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+        http.csrf().disable();
     }
 
     @Bean
@@ -116,7 +118,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/auth/login"
         );
         web.ignoring().antMatchers(
-                HttpMethod.GET,
                 "/",
                 "/h2/**", // vao trang quan tri database h2 , còn erro k vao đc  
                 "/**/**/*.do", // h2
@@ -129,6 +130,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/**/*.css",
                 "/**/*.js"
             );
+        
         //web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
 
     }
