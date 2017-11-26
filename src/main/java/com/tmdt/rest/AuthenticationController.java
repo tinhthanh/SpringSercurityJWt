@@ -1,5 +1,6 @@
 package com.tmdt.rest;
 
+import com.tmdt.common.CustomErrorType;
 import com.tmdt.common.DeviceProvider;
 import com.tmdt.model.User;
 import com.tmdt.model.UserTokenState;
@@ -7,6 +8,7 @@ import com.tmdt.security.TokenHelper;
 import com.tmdt.security.auth.JwtAuthenticationRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mobile.device.Device;
@@ -53,26 +55,33 @@ public class AuthenticationController {
             HttpServletResponse response,
             Device device
     ) throws AuthenticationException, IOException {
+     try {
+         final Authentication authentication = authenticationManager.authenticate(
+                 new UsernamePasswordAuthenticationToken(
+                         authenticationRequest.getUsername(),
+                         authenticationRequest.getPassword()
+                 )
+         );
 
+         // Inject into security context
+         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+         // token creation
+         User user = (User)authentication.getPrincipal();
+         String jws = tokenHelper.generateToken( user.getUsername(), device);
+         int expiresIn = tokenHelper.getExpiredIn(device);
+         // Add cookie to response
+         response.addCookie( createAuthCookie( jws, expiresIn ) );
+         // Return the token
+         return ResponseEntity.ok(new UserTokenState(jws, expiresIn));
+    	 
+     }catch (Exception  e ) {
+		// TODO: handle exception
+    	  return new ResponseEntity(new CustomErrorType("Không tìm thấy not found."),
+                 HttpStatus.FORBIDDEN);
+	}
         // Perform the security
-        final Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        authenticationRequest.getUsername(),
-                        authenticationRequest.getPassword()
-                )
-        );
-
-        // Inject into security context
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        // token creation
-        User user = (User)authentication.getPrincipal();
-        String jws = tokenHelper.generateToken( user.getUsername(), device);
-        int expiresIn = tokenHelper.getExpiredIn(device);
-        // Add cookie to response
-        response.addCookie( createAuthCookie( jws, expiresIn ) );
-        // Return the token
-        return ResponseEntity.ok(new UserTokenState(jws, expiresIn));
+   
     }
 
     @RequestMapping(value = "/refresh", method = RequestMethod.GET)

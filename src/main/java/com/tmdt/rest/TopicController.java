@@ -42,7 +42,7 @@ public class TopicController {
 	            description = "Lấy tấc cả các topic",
 	            produces = {MediaType.APPLICATION_JSON_VALUE})
 	    @ApiResponseObject
-	    @RequestMapping( method = GET, value = "/all-topic" )
+	    @RequestMapping( method = GET, value = "/topic/all-topic" )
 	    @PreAuthorize("hasRole('ADMIN')")
 	    public  ResponseEntity<List<Topic>>  getAllTopic() {
 		  if (this.topicservice.getAllTopic().isEmpty()) {
@@ -70,15 +70,15 @@ public class TopicController {
 	            description = "Thêm 1 topic mới",
 	            produces = {MediaType.APPLICATION_JSON_VALUE})
 	    @ApiResponseObject
-	    @RequestMapping( method = POST, value = "/create" )
+	    @RequestMapping( method = POST, value = "/topic/create" )
 	    @PreAuthorize("hasRole('ADMIN')")
 	    public ResponseEntity<?> createTopic( @RequestBody Topic topic ) {
 		  String id ;
-		  if ( (id = this.topicservice.create(topic)).equals("")) {
+		  if ( ( this.topicservice.create(topic)) == null) {
 	            return new ResponseEntity(new CustomErrorType("Erro insert data " + 
 	            topic.getTopicID() + " already exist."),HttpStatus.CONFLICT);
-	        }
-	        return new ResponseEntity<String>(id, HttpStatus.CREATED);
+		  }
+	        return new ResponseEntity<Topic>(topic, HttpStatus.OK);
 	      
 	    }
 	  @ApiAuthToken
@@ -86,14 +86,34 @@ public class TopicController {
 	            description = "Xoá một Topic ",
 	            produces = {MediaType.APPLICATION_JSON_VALUE})
 	    @ApiResponseObject
-	  @RequestMapping( method = DELETE,value = "/delete/{id}")
-	    public ResponseEntity<?> deleteUser(@ApiPathParam(name = "id", description = "Id của topic") @PathVariable String id) {
+	    @PreAuthorize("hasRole('ADMIN')")
+	  @RequestMapping( method = DELETE,value = "/topic/delete/{id}")
+	    public ResponseEntity<?> deleteTopic(@ApiPathParam(name = "id", description = "Id của topic") @PathVariable String id) {
 	        boolean b = this.topicservice.deleteTopicById(id);
 	        if (b == false) {
 	            return new ResponseEntity(new CustomErrorType("Không tìm thấy  " + id + " not found."),
 	                    HttpStatus.NOT_FOUND);
 	        }
 	        return new ResponseEntity<Topic>(HttpStatus.NO_CONTENT); // return 204
+	    }
+	  @ApiAuthToken
+	   @ApiMethod(
+	            description = " Update Topic  ",
+	            produces = {MediaType.APPLICATION_JSON_VALUE})
+	    @ApiResponseObject
+	  @RequestMapping( method = PUT,value = "/topic/update/{id}")
+	   @PreAuthorize("hasRole('ADMIN')")
+	    public ResponseEntity<?> updateTopic(@ApiPathParam(name = "id", description = "Id của topic") @PathVariable String id, @RequestBody Topic topic) {
+		  Topic temp = this.topicservice.findId(id);
+		  
+	        if (temp == null) {
+	            return new ResponseEntity(new CustomErrorType("Không tìm thấy " + id + " not found."),
+	                    HttpStatus.NOT_FOUND);
+	        }
+	        temp.setTopicDescription(topic.getTopicDescription());
+	        temp.setTopicName(topic.getTopicName());
+	        temp.setTopicStatut(topic.getTopicStatut());
+	        return new ResponseEntity<Topic>(temp, HttpStatus.OK);
 	    }
 	 
 	  

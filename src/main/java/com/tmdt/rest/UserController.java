@@ -9,11 +9,13 @@ import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.security.Principal;
 import java.util.List;
@@ -47,7 +49,12 @@ public class UserController {
     @RequestMapping("/whoami")
     @PreAuthorize("hasRole('USER')")
     public User user(Principal user) {
+    	try {
         return this.userService.findByUsername(user.getName());
+    	}catch (Exception e) {
+			// TODO: handle exception
+           throw new HttpClientErrorException(HttpStatus.GONE, e.getMessage());
+		}
     }
     
 }

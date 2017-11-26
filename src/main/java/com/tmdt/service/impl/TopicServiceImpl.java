@@ -34,7 +34,7 @@ public class TopicServiceImpl implements TopicService {
 	}
 
 	@Override
-	public String create(Topic topic) {
+	public Topic create(Topic topic) {
 		// TODO Auto-generated method stub
 		return mockdata.add(topic);
 	}

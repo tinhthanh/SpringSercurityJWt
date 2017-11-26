@@ -33,7 +33,7 @@ public class TokenHelper {
     public String SECRET;
 
 //    @Value("${jwt.expires_in}")
-	 @Value("300") // 5p
+	 @Value("30") // 5p
     private int EXPIRES_IN;
 
 //    @Value("${jwt.mobile_expires_in}")
@@ -96,13 +96,14 @@ public class TokenHelper {
         Date a = timeProvider.now();
         try {
             final Claims claims = this.getAllClaimsFromToken(token);
-            claims.setIssuedAt(a);
+             claims.setIssuedAt(a);
             refreshedToken = Jwts.builder()
                 .setClaims(claims)
                 .setExpiration(generateExpirationDate(device))
                 .signWith( SIGNATURE_ALGORITHM, SECRET )
                 .compact();
-        } catch (Exception e) {
+                   } catch (Exception e) {
+            e.printStackTrace();
             refreshedToken = null;
         }
         return refreshedToken;
@@ -182,6 +183,7 @@ public class TokenHelper {
          *  e.g Bearer your_token
          */
         String authHeader = request.getHeader(AUTH_HEADER);
+          System.out.println(getUsernameFromToken(authHeader));
         if ( authHeader != null && authHeader.startsWith("Bearer ")) {
             return authHeader.substring(7);
         }
